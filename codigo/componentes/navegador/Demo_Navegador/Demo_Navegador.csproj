@@ -13,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CapaControlador_Navegador\CapaControlador_Navegador.csproj" />
-    <ProjectReference Include="..\CapaModelo_Navegador\CapaModelo_Navegador.csproj" />
-    <ProjectReference Include="..\CapaVista_Navegador\CapaVista_Navegador.csproj" />
+    <Reference Include="Capa_Vista_Navegador">
+      <HintPath>..\Modelo_MVC\CapaVista_Navegador\bin\Debug\Capa_Vista_Navegador.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

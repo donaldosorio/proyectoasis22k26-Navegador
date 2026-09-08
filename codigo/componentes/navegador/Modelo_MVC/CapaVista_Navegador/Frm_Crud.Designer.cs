@@ -1,4 +1,8 @@
-﻿namespace CapaVista_Navegador
+﻿using System.Windows.Forms;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace CapaVista_Navegador
 {
     partial class Frm_Crud
     {
@@ -33,7 +37,7 @@
             this.Btn_ingresar = new System.Windows.Forms.Button();
             this.Imgn_list1 = new System.Windows.Forms.ImageList(this.components);
             this.Btn_cancelar = new System.Windows.Forms.Button();
-            this.Btn_refrescar = new System.Windows.Forms.Button();
+            this.Btn_modificar = new System.Windows.Forms.Button();
             this.Btn_imprimir = new System.Windows.Forms.Button();
             this.Btn_guardar = new System.Windows.Forms.Button();
             this.Btn_siguiente = new System.Windows.Forms.Button();
@@ -44,7 +48,7 @@
             this.Btn_salir = new System.Windows.Forms.Button();
             this.Btn_fin = new System.Windows.Forms.Button();
             this.Dgv_datos = new System.Windows.Forms.DataGridView();
-            this.Btn_modificar = new System.Windows.Forms.Button();
+            this.Btn_refrescar = new System.Windows.Forms.Button();
             this.Btn_ayuda = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Dgv_datos)).BeginInit();
             this.SuspendLayout();
@@ -58,6 +62,7 @@
             this.Btn_ingresar.Size = new System.Drawing.Size(101, 81);
             this.Btn_ingresar.TabIndex = 0;
             this.Btn_ingresar.UseVisualStyleBackColor = true;
+            this.Btn_ingresar.Click += new System.EventHandler(this.Btn_ingresar_Click);
             // 
             // Imgn_list1
             // 
@@ -89,15 +94,15 @@
             this.Btn_cancelar.TabIndex = 1;
             this.Btn_cancelar.UseVisualStyleBackColor = true;
             // 
-            // Btn_refrescar
+            // Btn_modificar
             // 
-            this.Btn_refrescar.ImageIndex = 9;
-            this.Btn_refrescar.ImageList = this.Imgn_list1;
-            this.Btn_refrescar.Location = new System.Drawing.Point(547, 24);
-            this.Btn_refrescar.Name = "Btn_refrescar";
-            this.Btn_refrescar.Size = new System.Drawing.Size(101, 81);
-            this.Btn_refrescar.TabIndex = 2;
-            this.Btn_refrescar.UseVisualStyleBackColor = true;
+            this.Btn_modificar.ImageIndex = 9;
+            this.Btn_modificar.ImageList = this.Imgn_list1;
+            this.Btn_modificar.Location = new System.Drawing.Point(547, 24);
+            this.Btn_modificar.Name = "Btn_modificar";
+            this.Btn_modificar.Size = new System.Drawing.Size(101, 81);
+            this.Btn_modificar.TabIndex = 2;
+            this.Btn_modificar.UseVisualStyleBackColor = true;
             // 
             // Btn_imprimir
             // 
@@ -168,7 +173,6 @@
             this.Btn_Consultar.Size = new System.Drawing.Size(101, 81);
             this.Btn_Consultar.TabIndex = 9;
             this.Btn_Consultar.UseVisualStyleBackColor = true;
-            this.Btn_Consultar.Click += new System.EventHandler(this.Btn_Consultar_Click);
             // 
             // Btn_salir
             // 
@@ -201,15 +205,15 @@
             this.Dgv_datos.Size = new System.Drawing.Size(837, 264);
             this.Dgv_datos.TabIndex = 12;
             // 
-            // Btn_modificar
+            // Btn_refrescar
             // 
-            this.Btn_modificar.ImageIndex = 10;
-            this.Btn_modificar.ImageList = this.Imgn_list1;
-            this.Btn_modificar.Location = new System.Drawing.Point(440, 24);
-            this.Btn_modificar.Name = "Btn_modificar";
-            this.Btn_modificar.Size = new System.Drawing.Size(101, 81);
-            this.Btn_modificar.TabIndex = 13;
-            this.Btn_modificar.UseVisualStyleBackColor = true;
+            this.Btn_refrescar.ImageIndex = 10;
+            this.Btn_refrescar.ImageList = this.Imgn_list1;
+            this.Btn_refrescar.Location = new System.Drawing.Point(440, 24);
+            this.Btn_refrescar.Name = "Btn_refrescar";
+            this.Btn_refrescar.Size = new System.Drawing.Size(101, 81);
+            this.Btn_refrescar.TabIndex = 13;
+            this.Btn_refrescar.UseVisualStyleBackColor = true;
             // 
             // Btn_ayuda
             // 
@@ -228,7 +232,7 @@
             this.BackColor = System.Drawing.Color.Beige;
             this.ClientSize = new System.Drawing.Size(1089, 653);
             this.Controls.Add(this.Btn_ayuda);
-            this.Controls.Add(this.Btn_modificar);
+            this.Controls.Add(this.Btn_refrescar);
             this.Controls.Add(this.Dgv_datos);
             this.Controls.Add(this.Btn_fin);
             this.Controls.Add(this.Btn_salir);
@@ -239,7 +243,7 @@
             this.Controls.Add(this.Btn_siguiente);
             this.Controls.Add(this.Btn_guardar);
             this.Controls.Add(this.Btn_imprimir);
-            this.Controls.Add(this.Btn_refrescar);
+            this.Controls.Add(this.Btn_modificar);
             this.Controls.Add(this.Btn_cancelar);
             this.Controls.Add(this.Btn_ingresar);
             this.Name = "Frm_Crud";
@@ -254,7 +258,7 @@
         private System.Windows.Forms.Button Btn_ingresar;
         private System.Windows.Forms.ImageList Imgn_list1;
         private System.Windows.Forms.Button Btn_cancelar;
-        private System.Windows.Forms.Button Btn_refrescar;
+        private System.Windows.Forms.Button Btn_modificar;
         private System.Windows.Forms.Button Btn_imprimir;
         private System.Windows.Forms.Button Btn_guardar;
         private System.Windows.Forms.Button Btn_siguiente;
@@ -265,7 +269,7 @@
         private System.Windows.Forms.Button Btn_salir;
         private System.Windows.Forms.Button Btn_fin;
         private System.Windows.Forms.DataGridView Dgv_datos;
-        private System.Windows.Forms.Button Btn_modificar;
+        private System.Windows.Forms.Button Btn_refrescar;
         private System.Windows.Forms.Button Btn_ayuda;
     }
 }

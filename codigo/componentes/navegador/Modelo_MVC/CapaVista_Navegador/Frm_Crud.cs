@@ -2558,6 +2558,8 @@ namespace CapaVista_Navegador
         // =========================================================
         // OBTENER BOOLEANO DE ESQUEMA DE FORMA SEGURA
         // =========================================================
+        /// <summary>
+      //hola
 
         private bool ObtenerBooleanoEsquema(
             DataRow fila,

@@ -11,11 +11,9 @@ namespace CapaVista_Navegador
 {
     public partial class Frm_Crud : Form
     {
-        // =========================================================
         // CAMBIAR AQUÍ MANUALMENTE LA TABLA A LA QUE SE DESEA HACER
-        // EL CRUD (ya no se elige desde una ventana emergente).
-        // =========================================================
-        private string nombreTabla = "tbl_permisos";
+
+        private string nombreTabla = "tbl_seguros";
         private Controlador controlador = new Controlador();
 
         private DataGridView dgvDatos;

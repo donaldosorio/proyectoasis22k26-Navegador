@@ -7,8 +7,8 @@
     <ProjectGuid>{1FF3723C-592D-4F22-A4FB-0EB6BBBF95B6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Capa_Modelo_Navegador</RootNamespace>
-    <AssemblyName>Capa_Modelo_Navegador</AssemblyName>
+    <RootNamespace>CapaModelo_Navegador</RootNamespace>
+    <AssemblyName>CapaModelo_Navegador</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

@@ -184,6 +184,7 @@ namespace CapaVista_Contabilidad
             this.MaximizeBox = false;
             this.Name = "FrmCierreContable";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "10004 - CierreContable";
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1180, 688);
             this.BackColor = System.Drawing.Color.FromArgb(246, 247, 248);

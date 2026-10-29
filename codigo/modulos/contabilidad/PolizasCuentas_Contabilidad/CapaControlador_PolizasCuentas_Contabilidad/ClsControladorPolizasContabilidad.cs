@@ -108,10 +108,95 @@ namespace CapaControlador_Contabilidad
                     // Inicio de cambio: Mario Taracena - 0901-23-9335 - 27/10/2026
                     Lineas = Poliza.Detalle.Select(Detalle => new ClsModeloLineaPolizaContabilidad
                     // Fin de cambio: Mario Taracena - 0901-23-9335 - 27/10/2026
-                        { IdCuenta = Detalle.IdCuenta, Cuenta = Detalle.Cuenta, Debe = Detalle.Debe, Haber = Detalle.Haber }).ToList()
+                        // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+                        { IdCuenta = Detalle.IdCuenta, Cuenta = Detalle.Codigo + " - " + Detalle.Cuenta, Debe = Detalle.Debe, Haber = Detalle.Haber }).ToList()
+                        // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
                 })
                 .ToList();
         }
+
+        // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+        public ClsModeloPolizaContabilidad ContabilidadFuncObtenerPoliza(int IdPoliza)
+        {
+            return ContabilidadFuncObtenerPolizas().FirstOrDefault(Poliza => Poliza.IdPoliza == IdPoliza);
+        }
+
+        public bool ContabilidadFuncPuedeModificar(string Estado)
+        {
+            return string.IsNullOrWhiteSpace(Estado) || Estado == "BORRADOR";
+        }
+
+        public int ContabilidadFuncNumeroPoliza(string Codigo)
+        {
+            int Numero;
+            return !string.IsNullOrWhiteSpace(Codigo) && int.TryParse(Codigo.Substring(Codigo.LastIndexOf('-') + 1), out Numero) ? Numero : 0;
+        }
+
+        public string[] ContabilidadFuncObtenerTiposPeriodo()
+        {
+            return new[] { "MENSUAL", "ANUAL", "SEMANAL", "RANGO" };
+        }
+
+        public string ContabilidadFuncModoActualizacion(int IdModulo)
+        {
+            try
+            {
+                return _Repositorio.ContabilidadFuncObtenerMetodoActualizacion(IdModulo) == "ONLINE" ? "ONLINE" : "BATCH";
+            }
+            catch
+            {
+                return "BATCH";
+            }
+        }
+
+        public void ContabilidadMetCalcularRango(string TipoPeriodo, DateTime Referencia, out DateTime Desde, out DateTime Hasta)
+        {
+            DateTime Dia = Referencia.Date;
+            switch (TipoPeriodo)
+            {
+                case "ANUAL":
+                    Desde = new DateTime(Dia.Year, 1, 1);
+                    Hasta = new DateTime(Dia.Year, 12, 31);
+                    break;
+                case "SEMANAL":
+                    Desde = Dia.AddDays(-(((int)Dia.DayOfWeek + 6) % 7));
+                    Hasta = Desde.AddDays(6);
+                    break;
+                default:
+                    Desde = new DateTime(Dia.Year, Dia.Month, 1);
+                    Hasta = Desde.AddMonths(1).AddDays(-1);
+                    break;
+            }
+        }
+
+        public int ContabilidadFuncActualizarSaldos(string TipoPeriodo, DateTime Desde, DateTime Hasta, out string Mensaje)
+        {
+            if (!ContabilidadFuncObtenerTiposPeriodo().Contains(TipoPeriodo))
+            {
+                Mensaje = "El tipo de período '" + TipoPeriodo + "' no es válido.";
+                return -1;
+            }
+            if (Hasta.Date < Desde.Date)
+            {
+                Mensaje = "La fecha final no puede ser menor que la inicial.";
+                return -1;
+            }
+            try
+            {
+                int Procesadas = _Repositorio.ContabilidadFuncActualizarSaldos("BATCH", TipoPeriodo, Desde.Date, Hasta.Date, 0,
+                    ClsControladorSeguridadContabilidad.ContabilidadFuncUsuarioSesion());
+                Mensaje = Procesadas == 0
+                    ? "No hay pólizas validadas pendientes de actualizar entre " + Desde.ToString("dd/MM/yyyy") + " y " + Hasta.ToString("dd/MM/yyyy") + "."
+                    : "Saldos actualizados: " + Procesadas + (Procesadas == 1 ? " póliza aplicada." : " pólizas aplicadas.");
+                return Procesadas;
+            }
+            catch (Exception Excepcion)
+            {
+                Mensaje = "No se pudieron actualizar los saldos: " + Excepcion.Message;
+                return -1;
+            }
+        }
+        // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
 
         public bool ContabilidadFuncGrabarCambios(EstadoEntidadContabilidad Estado, ClsModeloPolizaContabilidad Modelo, out string Mensaje)
         {
@@ -141,6 +226,14 @@ namespace CapaControlador_Contabilidad
                 Mensaje = "Una cuenta no puede repetirse en el detalle de la póliza.";
                 return false;
             }
+            // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+            if (Estado == EstadoEntidadContabilidad.Modificar && !string.IsNullOrWhiteSpace(Modelo.Periodo) &&
+                Modelo.Periodo != ContabilidadFuncObtenerPeriodo(Modelo.Fecha))
+            {
+                Mensaje = "La fecha de la póliza debe quedar dentro del período " + Modelo.Periodo + ".";
+                return false;
+            }
+            // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
 
             ClsPolizaContabilidad Entidad = new ClsPolizaContabilidad
             {
@@ -178,9 +271,27 @@ namespace CapaControlador_Contabilidad
                             Mensaje = "Una póliza aplicada no se puede anular.";
                             return false;
                         }
-                        Mensaje = "Póliza eliminada correctamente.";
+                        // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+                        Mensaje = "Póliza anulada correctamente.";
+                        // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
                         break;
                 }
+                // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+                if (Estado != EstadoEntidadContabilidad.Borrar && EstadoPoliza == "VALIDADA" && Modelo.ModoActualizacion == "ONLINE")
+                {
+                    try
+                    {
+                        _Repositorio.ContabilidadFuncActualizarSaldos("LINEA", "RANGO", Entidad.Fecha, Entidad.Fecha, Modelo.IdPoliza,
+                            ClsControladorSeguridadContabilidad.ContabilidadFuncUsuarioSesion());
+                        Modelo.Estado = "APLICADA";
+                        Mensaje += " Saldos actualizados en línea: la póliza quedó aplicada.";
+                    }
+                    catch (Exception Excepcion)
+                    {
+                        Mensaje += " La póliza quedó validada, pero no se pudieron actualizar los saldos: " + Excepcion.Message;
+                    }
+                }
+                // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
                 return true;
             }
             catch (Exception Excepcion)

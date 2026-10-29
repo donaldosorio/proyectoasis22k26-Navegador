@@ -6,12 +6,11 @@
  * Fecha : 17/10/2026
  * ==================================================================
  * Propósito :
- *  Reglas de activos fijos: catálogos, depreciación por línea recta,
- *  validación y grabación según el estado. Responsable de la
+ *  Reglas de activos fijos: catálogos, validación, grabación según el
+ *  estado y sincronización con Logística. Responsable de la
  *  pantalla: Dylan.
  * Reglas especificas:
- *  La validación vive en ClsModeloActivoFijoContabilidad. La
- *  depreciación mensual se redondea a dos decimales.
+ *  La validación vive en ClsModeloActivoFijoContabilidad.
  * ===================================================================
 */
 
@@ -49,54 +48,95 @@ namespace CapaControlador_Contabilidad
             return Tabla;
         }
 
-        private ClsModeloActivoFijoContabilidad ContabilidadFuncCrearModelo(string Descripcion, string Centro, DateTime Adquisicion,
+        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+        public DataTable ContabilidadFuncActivos()
+        {
+            Dictionary<string, string> Tipos = _Repositorio.ContabilidadFuncObtenerVidaUtil().ToDictionary(Vida => Vida.Tipo, Vida => Vida.Nombre);
+            DataTable Tabla = new DataTable();
+            Tabla.Columns.Add("IdActivo", typeof(int));
+            Tabla.Columns.Add("Codigo", typeof(string));
+            Tabla.Columns.Add("Descripcion", typeof(string));
+            Tabla.Columns.Add("Modulo", typeof(string));
+            Tabla.Columns.Add("TipoCodigo", typeof(string));
+            Tabla.Columns.Add("Tipo", typeof(string));
+            Tabla.Columns.Add("Adquisicion", typeof(DateTime));
+            Tabla.Columns.Add("Inicio", typeof(DateTime));
+            Tabla.Columns.Add("Compra", typeof(decimal));
+            Tabla.Columns.Add("Residual", typeof(decimal));
+            Tabla.Columns.Add("Libros", typeof(decimal));
+            Tabla.Columns.Add("Meses", typeof(int));
+            Tabla.Columns.Add("Logistica", typeof(string));
+            foreach (ClsActivoFijoContabilidad Activo in _Repositorio.ContabilidadFuncObtenerTodos())
+                Tabla.Rows.Add(Activo.IdActivo, Activo.Codigo, Activo.Descripcion, Activo.Modulo, Activo.Tipo,
+                    Tipos.ContainsKey(Activo.Tipo) ? Tipos[Activo.Tipo] : Activo.Tipo, Activo.Adquisicion, Activo.Inicio,
+                    Activo.Compra, Activo.Residual, Activo.ValorEnLibros, Activo.Meses,
+                    Activo.EstadoLogistica == "ENVIADO" ? "Sincronizado · " + Activo.ReferenciaLogistica : "Pendiente");
+            return Tabla;
+        }
+        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+
+        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+        private ClsModeloActivoFijoContabilidad ContabilidadFuncCrearModelo(string Descripcion, DateTime Adquisicion,
+        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             DateTime Inicio, decimal Compra, decimal Residual, int Meses)
         {
             return new ClsModeloActivoFijoContabilidad
             {
-                Descripcion = Descripcion, Centro = Centro, Adquisicion = Adquisicion, Inicio = Inicio,
+                // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+                Descripcion = Descripcion, Adquisicion = Adquisicion, Inicio = Inicio,
+                // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
                 Compra = Compra, Residual = Residual, Meses = Meses
             };
         }
 
-        public Dictionary<string, string> ContabilidadFuncErroresActivo(string Descripcion, string Centro, DateTime Adquisicion,
+        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+        public Dictionary<string, string> ContabilidadFuncErroresActivo(string Descripcion, DateTime Adquisicion,
+        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             DateTime Inicio, decimal Compra, decimal Residual, int Meses)
         {
             return ClsValidacionDatosContabilidad.ContabilidadFuncErrores(
-                ContabilidadFuncCrearModelo(Descripcion, Centro, Adquisicion, Inicio, Compra, Residual, Meses));
+                // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+                ContabilidadFuncCrearModelo(Descripcion, Adquisicion, Inicio, Compra, Residual, Meses));
+                // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
         }
 
-        public string ContabilidadFuncValidarActivo(string Descripcion, string Centro, DateTime Adquisicion,
+        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+        public string ContabilidadFuncValidarActivo(string Descripcion, DateTime Adquisicion,
+        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             DateTime Inicio, decimal Compra, decimal Residual, int Meses)
         {
-            return ContabilidadFuncErroresActivo(Descripcion, Centro, Adquisicion, Inicio, Compra, Residual, Meses).Values.FirstOrDefault() ?? string.Empty;
+            // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+            return ContabilidadFuncErroresActivo(Descripcion, Adquisicion, Inicio, Compra, Residual, Meses).Values.FirstOrDefault() ?? string.Empty;
+            // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
         }
 
-        public decimal ContabilidadFuncBaseDepreciable(decimal Compra, decimal Residual)
-        {
-            return Compra - Residual;
-        }
-
-        public decimal ContabilidadFuncDepreciacion(decimal Compra, decimal Residual, int Meses)
-        {
-            if (Compra < 0m || Residual < 0m || Residual > Compra || Meses <= 0) return 0m;
-            return decimal.Round((Compra - Residual) / Meses, 2, MidpointRounding.AwayFromZero);
-        }
-
-        public bool ContabilidadFuncGrabarCambios(EstadoEntidadContabilidad Estado, string Descripcion, string Centro, string Modulo,
+        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+        public bool ContabilidadFuncGrabarCambios(EstadoEntidadContabilidad Estado, ref int IdActivo, string Descripcion, string Modulo,
+        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             string Tipo, DateTime Adquisicion, DateTime Inicio, decimal Compra, decimal Residual, int Meses, out string Mensaje)
         {
-            ClsModeloActivoFijoContabilidad Modelo = ContabilidadFuncCrearModelo(Descripcion, Centro, Adquisicion, Inicio, Compra, Residual, Meses);
+            // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+            ClsModeloActivoFijoContabilidad Modelo = ContabilidadFuncCrearModelo(Descripcion, Adquisicion, Inicio, Compra, Residual, Meses);
+            // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+            // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+            Modelo.IdActivo = IdActivo;
+            // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             Modelo.Modulo = Modulo;
             Modelo.Tipo = Tipo;
-            Mensaje = ClsValidacionDatosContabilidad.ContabilidadFuncPrimerError(Modelo);
+            // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+            Mensaje = Estado == EstadoEntidadContabilidad.Borrar ? string.Empty : ClsValidacionDatosContabilidad.ContabilidadFuncPrimerError(Modelo);
+            if (Mensaje == string.Empty && Estado != EstadoEntidadContabilidad.Borrar && (string.IsNullOrWhiteSpace(Modulo) || string.IsNullOrWhiteSpace(Tipo)))
+                Mensaje = "Seleccione el módulo y el tipo de activo.";
+            // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             if (Mensaje != string.Empty) return false;
 
             ClsActivoFijoContabilidad Entidad = new ClsActivoFijoContabilidad
             {
-                IdActivo = Modelo.IdActivo, Descripcion = Modelo.Descripcion.Trim(), Centro = Modelo.Centro.Trim(), Modulo = Modelo.Modulo,
-                Tipo = Modelo.Tipo, Adquisicion = Modelo.Adquisicion, Inicio = Modelo.Inicio, Compra = Modelo.Compra,
-                Residual = Modelo.Residual, Meses = Modelo.Meses
+                // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+                IdActivo = Modelo.IdActivo, Descripcion = (Modelo.Descripcion ?? string.Empty).Trim(),
+                Modulo = Modelo.Modulo, Tipo = Modelo.Tipo, Adquisicion = Modelo.Adquisicion, Inicio = Modelo.Inicio, Compra = Modelo.Compra,
+                Residual = Modelo.Residual, ValorEnLibros = Modelo.Compra, Meses = Modelo.Meses
+                // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
             };
             try
             {
@@ -104,14 +144,33 @@ namespace CapaControlador_Contabilidad
                 {
                     case EstadoEntidadContabilidad.Agregar:
                         _Repositorio.ContabilidadFuncAgregar(Entidad);
-                        Mensaje = "Activo validado correctamente.";
+                        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+                        IdActivo = Entidad.IdActivo;
+                        Mensaje = "Activo " + Entidad.Codigo + " guardado correctamente.";
+                        string Envio;
+                        ContabilidadFuncEnviarPendientesLogistica(out Envio);
+                        if (Envio != string.Empty) Mensaje += " " + Envio;
+                        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
                         break;
                     case EstadoEntidadContabilidad.Modificar:
-                        _Repositorio.ContabilidadFuncEditar(Entidad);
+                        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+                        if (_Repositorio.ContabilidadFuncEditar(Entidad) == 0)
+                        {
+                            Mensaje = "El activo ya no existe o fue eliminado.";
+                            return false;
+                        }
+                        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
                         Mensaje = "Activo actualizado correctamente.";
                         break;
                     case EstadoEntidadContabilidad.Borrar:
-                        _Repositorio.ContabilidadFuncEliminar(Entidad);
+                        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+                        if (_Repositorio.ContabilidadFuncEliminar(Entidad) == 0)
+                        {
+                            Mensaje = "El activo ya no existe o fue eliminado.";
+                            return false;
+                        }
+                        IdActivo = 0;
+                        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
                         Mensaje = "Activo eliminado correctamente.";
                         break;
                 }
@@ -123,5 +182,57 @@ namespace CapaControlador_Contabilidad
                 return false;
             }
         }
+
+        // Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+        public int ContabilidadFuncEnviarPendientesLogistica(out string Mensaje)
+        {
+            Mensaje = string.Empty;
+            try
+            {
+                List<ClsActivoFijoContabilidad> Pendientes = _Repositorio.ContabilidadFuncObtenerTodos()
+                    .Where(Activo => Activo.EstadoLogistica == "PENDIENTE").ToList();
+                if (Pendientes.Count == 0) return 0;
+                IReceptorActivoFijoContabilidad Receptor = ClsEnlaceLogisticaContabilidad.ContabilidadFuncBuscarReceptor();
+                if (Receptor == null)
+                {
+                    Mensaje = "Logística todavía no publica la recepción de activos: " + Pendientes.Count + " activo(s) quedan pendientes de sincronizar.";
+                    return 0;
+                }
+                Dictionary<string, string> Tipos = _Repositorio.ContabilidadFuncObtenerVidaUtil().ToDictionary(Vida => Vida.Tipo, Vida => Vida.Nombre);
+                int Enviados = 0;
+                List<string> Rechazos = new List<string>();
+                foreach (ClsActivoFijoContabilidad Activo in Pendientes)
+                {
+                    ClsModeloActivoLogisticaContabilidad Datos = new ClsModeloActivoLogisticaContabilidad
+                    {
+                        Codigo = Activo.Codigo, Descripcion = Activo.Descripcion, Modulo = Activo.Modulo, CodigoTipo = Activo.Tipo,
+                        NombreTipo = Tipos.ContainsKey(Activo.Tipo) ? Tipos[Activo.Tipo] : Activo.Tipo, FechaAdquisicion = Activo.Adquisicion,
+                        FechaInicioUso = Activo.Inicio, ValorCompra = Activo.Compra, ValorResidual = Activo.Residual, VidaUtilMeses = Activo.Meses
+                    };
+                    try
+                    {
+                        string Referencia, Respuesta;
+                        if (Receptor.ContabilidadFuncRecibirActivoFijo(Datos, out Referencia, out Respuesta))
+                        {
+                            _Repositorio.ContabilidadFuncMarcarEnviadoLogistica(Activo.IdActivo, Referencia);
+                            Enviados++;
+                        }
+                        else Rechazos.Add(Activo.Codigo + ": " + Respuesta);
+                    }
+                    catch (Exception Excepcion)
+                    {
+                        Rechazos.Add(Activo.Codigo + ": " + Excepcion.Message);
+                    }
+                }
+                Mensaje = Enviados + " activo(s) sincronizados con Logística." + (Rechazos.Count == 0 ? string.Empty : " Siguen pendientes " + string.Join("; ", Rechazos) + ".");
+                return Enviados;
+            }
+            catch (Exception Excepcion)
+            {
+                Mensaje = "No se pudo sincronizar con Logística: " + Excepcion.Message;
+                return 0;
+            }
+        }
+        // Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
     }
 }

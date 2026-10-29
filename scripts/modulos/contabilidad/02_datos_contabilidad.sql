@@ -435,6 +435,10 @@ UPDATE tblCuenta c
        c.cargoPeriodoCuenta = s.cargoSaldoCuentaPeriodo,
        c.abonoPeriodoCuenta = s.abonoSaldoCuentaPeriodo,
        c.saldoActualCuenta  = s.saldoFinalSaldoCuentaPeriodo,
-       c.cargoActualCuenta  = s.cargoSaldoCuentaPeriodo,
-       c.abonoActualCuenta  = s.abonoSaldoCuentaPeriodo,
+       -- Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+       c.cargoAcumuladoCuenta = (SELECT SUM(a.cargoSaldoCuentaPeriodo) FROM tblSaldoCuentaPeriodo a
+                                  WHERE a.idCuenta = c.idCuenta AND a.periodoContableSaldoCuentaPeriodo BETWEEN '2026-01' AND '2026-10'),
+       c.abonoAcumuladoCuenta = (SELECT SUM(a.abonoSaldoCuentaPeriodo) FROM tblSaldoCuentaPeriodo a
+                                  WHERE a.idCuenta = c.idCuenta AND a.periodoContableSaldoCuentaPeriodo BETWEEN '2026-01' AND '2026-10'),
+       -- Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
        c.periodoSaldoCuenta = '2026-10';

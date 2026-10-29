@@ -358,3 +358,25 @@ JOIN    tblPolizaDetalle    pd ON pd.idPolizaEncabezado = pe.idPolizaEncabezado
 WHERE   pe.documentoOrigenPolizaEncabezado IS NOT NULL
 GROUP BY pe.idPolizaEncabezado, m.nombreModuloContable, pe.documentoOrigenPolizaEncabezado,
          pe.codigoPolizaEncabezado, pe.fechaPolizaEncabezado, pe.estadoPolizaEncabezado, pe.created_at;
+
+-- =============================================================================
+--  7. AJUSTES SOBRE TABLAS EXISTENTES
+--  Para bases que ya tienen las tablas creadas: ejecutar solo esta sección.
+-- =============================================================================
+
+-- Inicio de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026
+ALTER TABLE tblModuloContable
+    ADD COLUMN metodoActualizacionModuloContable VARCHAR(10) NOT NULL DEFAULT 'BATCH' AFTER codigoModuloContable,
+    ADD CONSTRAINT ckModuloMetodoActualizacion CHECK (metodoActualizacionModuloContable IN ('ONLINE','BATCH'));
+
+ALTER TABLE tblCuenta
+    RENAME COLUMN cargoActualCuenta TO cargoAcumuladoCuenta,
+    RENAME COLUMN abonoActualCuenta TO abonoAcumuladoCuenta;
+
+ALTER TABLE tblActivoFijo
+    DROP COLUMN codigoCentroCostoActivoFijo,
+    ADD COLUMN estadoEnvioLogisticaActivoFijo VARCHAR(10) NOT NULL DEFAULT 'PENDIENTE' AFTER fechaInicioUsoActivoFijo,
+    ADD COLUMN referenciaLogisticaActivoFijo VARCHAR(50) NULL AFTER estadoEnvioLogisticaActivoFijo,
+    ADD COLUMN fechaEnvioLogisticaActivoFijo DATETIME NULL AFTER referenciaLogisticaActivoFijo,
+    ADD CONSTRAINT ckActivoFijoEnvioLogistica CHECK (estadoEnvioLogisticaActivoFijo IN ('PENDIENTE','ENVIADO'));
+-- Fin de cambio: Dylan Hernández - 0901-23-519 - 28/10/2026

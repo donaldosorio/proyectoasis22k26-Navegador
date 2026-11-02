@@ -14,7 +14,7 @@
  *  se aceptan cuentas de detalle asignadas al módulo, pólizas cuadradas
  *  y períodos abiertos. Un mismo documento de origen nunca se registra
  *  dos veces. La póliza entra VALIDADA y se aplica a saldos al instante
- *  si el módulo trabaja en ONLINE.
+ *  si el módulo trabaja en LINEA.
  * ===================================================================
 */
 
@@ -109,7 +109,9 @@ namespace CapaControlador_Contabilidad
 
                 CodigoPoliza = Poliza.CodigoPoliza;
                 Estado = "VALIDADA";
-                if (Metodo != "ONLINE")
+                // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+                if (Metodo != "LINEA")
+                // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
                 {
                     Mensaje = "Póliza " + CodigoPoliza + " registrada como validada. Se aplicará a saldos en la próxima actualización batch.";
                     return true;

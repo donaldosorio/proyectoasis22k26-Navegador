@@ -160,7 +160,11 @@ namespace CapaControlador_Contabilidad
         {
             try
             {
-                return _Repositorio.ContabilidadFuncObtenerMetodoActualizacion(IdModulo) == "ONLINE" ? "ONLINE" : "BATCH";
+                // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+                // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+                return _Repositorio.ContabilidadFuncObtenerMetodoActualizacion(IdModulo) == "LINEA" ? "LINEA" : "BATCH";
+                // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+                // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
             }
             catch
             {
@@ -298,8 +302,10 @@ namespace CapaControlador_Contabilidad
                         // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
                         break;
                 }
+                // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+                if (Estado != EstadoEntidadContabilidad.Borrar && EstadoPoliza == "VALIDADA" && Modelo.ModoActualizacion == "LINEA")
+                // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
                 // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
-                if (Estado != EstadoEntidadContabilidad.Borrar && EstadoPoliza == "VALIDADA" && Modelo.ModoActualizacion == "ONLINE")
                 {
                     try
                     {

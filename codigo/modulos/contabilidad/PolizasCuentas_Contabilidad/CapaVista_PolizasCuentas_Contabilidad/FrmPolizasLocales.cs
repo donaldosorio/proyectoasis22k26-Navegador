@@ -72,8 +72,10 @@ namespace CapaVista_Contabilidad
             // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
         {
             _IdModulo = IdModulo;
+            // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+            _ModoActualizacion = ModoActualizacion == "LINEA" ? "LINEA" : "BATCH";
+            // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
             // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
-            _ModoActualizacion = ModoActualizacion == "ONLINE" ? "ONLINE" : "BATCH";
             _Polizas = Polizas == null ? new List<int>() : new List<int>(Polizas);
             // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
             InitializeComponent();
@@ -82,8 +84,10 @@ namespace CapaVista_Contabilidad
             // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
             ClsPresentacionContabilidad.ContabilidadMetPrepararVentana(this, "Pólizas locales", new Size(1180, 760));
             ContabilidadLblModo.Text = "● " + _ModoActualizacion;
-            ContabilidadLblModo.ForeColor = _ModoActualizacion == "ONLINE" ? Color.FromArgb(34, 139, 70) : Color.FromArgb(197, 143, 62);
             // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026
+            // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+            ContabilidadLblModo.ForeColor = _ModoActualizacion == "LINEA" ? Color.FromArgb(34, 139, 70) : Color.FromArgb(197, 143, 62);
+            // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
             foreach (Control Campo in new Control[] { ContabilidadTxtDescripcion, ContabilidadDtpFecha, ContabilidadCboEstado, ContabilidadCboOrigen, ContabilidadCboCuenta })
                 _Validacion.ContabilidadMetObligatorio(Campo);
             // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 28/10/2026

@@ -47,11 +47,15 @@ namespace CapaVista_Contabilidad
         {
             _Permisos = Permisos;
             _IdModulo = IdModulo;
-            _ModoActualizacion = ModoActualizacion == "ONLINE" ? "ONLINE" : "BATCH";
+            // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+            _ModoActualizacion = ModoActualizacion == "LINEA" ? "LINEA" : "BATCH";
+            // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
             InitializeComponent();
             ClsPresentacionContabilidad.ContabilidadMetPrepararVentana(this, "Pólizas", new Size(1180, 688));
             ContabilidadLblModo.Text = "Actualización: ● " + _ModoActualizacion;
-            ContabilidadLblModo.ForeColor = _ModoActualizacion == "ONLINE" ? Color.FromArgb(34, 139, 70) : Color.FromArgb(197, 143, 62);
+            // Inicio de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
+            ContabilidadLblModo.ForeColor = _ModoActualizacion == "LINEA" ? Color.FromArgb(34, 139, 70) : Color.FromArgb(197, 143, 62);
+            // Fin de cambio: Oskar Cermeño - 0901-23-15379 - 02/11/2026
             ClsPermisosMenuContabilidad.ContabilidadMetRestringir(ContabilidadBtnNueva, Permisos.PuedeInsertar);
             ClsPermisosMenuContabilidad.ContabilidadMetRestringir(ContabilidadBtnActualizarSaldos, Permisos.PuedeEditar);
 
